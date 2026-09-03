@@ -1,0 +1,59 @@
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        App\Entity\User: 'auto'
+
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        login:
+            pattern: ^/api/login
+            stateless: true
+            provider: app_user_provider
+            json_login:
+                check_path: /api/login_check
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: app_user_provider
+            jwt: ~
+
+        main:
+            lazy: true
+            provider: app_user_provider
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+            logout:
+                path: app_logout
+                target: app_login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 1209600
+                path: /
+
+    access_control:
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/cables, roles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_TECHNICIAN] }
+        - { path: ^/api/maintenances, roles: [ROLE_ADMIN, ROLE_TECHNICIAN] }
+        - { path: ^/api/alerts, roles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_TECHNICIAN] }
+        - { path: ^/api/ml, roles: [ROLE_ADMIN, ROLE_SUPERVISOR] }
+        - { path: ^/api/reports, roles: [ROLE_ADMIN, ROLE_SUPERVISOR] }
+        - { path: ^/api/users, roles: ROLE_ADMIN }
+        - { path: ^/api/dashboard, roles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_TECHNICIAN] }
+        - { path: ^/user, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: ROLE_ADMIN }
