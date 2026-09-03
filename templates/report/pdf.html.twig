@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport de fabrication — Prysmian Tunisia</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 2rem; color: #0F172A; background: #fff; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #E30613; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+        .logo-title { font-size: 24px; font-weight: 900; color: #E30613; }
+        .title { font-size: 20px; font-weight: 800; color: #0F172A; text-align: right; }
+        .meta-info { font-size: 12px; color: #64748B; margin-bottom: 1.5rem; }
+        .section-title { font-size: 16px; font-weight: 700; color: #0284C7; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #CBD5E1; padding-bottom: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 12px; }
+        th { background: #F1F5F9; color: #334155; font-weight: 700; padding: 8px 10px; border: 1px solid #CBD5E1; text-align: left; }
+        td { padding: 8px 10px; border: 1px solid #E2E8F0; }
+        .btn-print { background: #0284C7; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 700; cursor: pointer; margin-bottom: 1.5rem; }
+        @media print {
+            .no-print { display: none !important; }
+            body { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="margin-bottom: 1.5rem;">
+        <button class="btn-print" onclick="window.print()">Imprimer / Sauvegarder en PDF</button>
+        <a href="/" style="margin-left:15px;color:#0284C7;text-decoration:none;font-weight:600">Retour au Tableau de Bord</a>
+    </div>
+
+    <div class="header">
+        <div class="logo-title">Prysmian Group Tunisia</div>
+        <div class="title">Rapport de fabrication<br><span style="font-size:13px;font-weight:400;color:#64748B">Catalogue, production et qualité</span></div>
+    </div>
+
+    <div class="meta-info">
+        Rapport généré le <strong>{{ generatedAt|date('d/m/Y à H:i') }}</strong> par la plateforme de pilotage industriel Prysmian Group.
+    </div>
+
+    <div class="section-title">1. Catalogue des produits ({{ cables|length }} références)</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Référence</th>
+                <th>Désignation</th>
+                <th>Famille</th>
+                <th>Statut</th>
+                <th>Stock</th>
+                <th>Usine</th>
+                <th>Section</th>
+                <th>Isolation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in cables %}
+            <tr>
+                <td><strong>{{ c.referenceCode }}</strong></td>
+                <td>{{ c.designation }}</td>
+                <td>{{ c.cableType.value ?? c.cableType }}</td>
+                <td>{{ c.status.value ?? c.status }}</td>
+                <td>{{ c.stockMeters is not null ? c.stockMeters|number_format(0, ',', ' ') ~ ' m' : '—' }}</td>
+                <td>{{ c.factory ?: '—' }}</td>
+                <td>{{ c.conductorSection ? c.conductorSection ~ ' mm²' : '—' }}</td>
+                <td>{{ c.insulation ?: '—' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="section-title">2. Alertes qualité critiques et ouvertes</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Sévérité</th>
+                <th>Type d'Alerte</th>
+                <th>Câble Concerné</th>
+                <th>Message d'Alerte</th>
+                <th>Date d'Emission</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in alerts %}
+            <tr>
+                <td><strong>{{ a.severity.value ?? a.severity }}</strong></td>
+                <td>{{ a.alertType.value ?? a.alertType }}</td>
+                <td>{{ a.cable.referenceCode }} ({{ a.cable.factory ?: 'Usine non renseignée' }})</td>
+                <td>{{ a.message }}</td>
+                <td>{{ a.createdAt|date('d/m/Y H:i') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="section-title">3. Ordres de fabrication récents</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Référence</th>
+                <th>Étape</th>
+                <th>Description</th>
+                <th>Coût (TND)</th>
+                <th>Résultat</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in maintenances %}
+            <tr>
+                <td>{{ m.startDate|date('d/m/Y') }}</td>
+                <td>{{ m.cable.referenceCode }}</td>
+                <td>{{ m.maintenanceType.value ?? m.maintenanceType }}</td>
+                <td>{{ m.description }}</td>
+                <td><strong>{{ m.cost }} TND</strong></td>
+                <td>{{ m.resultStatus.value ?? m.resultStatus }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

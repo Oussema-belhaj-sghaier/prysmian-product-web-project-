@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" role="img" aria-label="Produit câble">
+  <rect width="160" height="120" rx="12" fill="#f9e8e6"/>
+  <circle cx="80" cy="60" r="34" fill="none" stroke="#d94841" stroke-width="12"/>
+  <circle cx="80" cy="60" r="16" fill="none" stroke="#51788d" stroke-width="7"/>
+  <path d="M110 60h24" stroke="#d94841" stroke-width="8" stroke-linecap="round"/>
+  <path d="M26 60h20" stroke="#d94841" stroke-width="8" stroke-linecap="round"/>
+</svg>

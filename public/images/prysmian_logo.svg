@@ -1,0 +1,11 @@
+<svg width="220" height="60" viewBox="0 0 220 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Prysmian Emblem / Wave Ribbon -->
+    <g transform="translate(4, 6)">
+        <path d="M 0 12 C 0 5, 8 0, 15 0 L 32 0 C 39 0, 44 5, 44 12 L 44 36 C 44 43, 39 48, 32 48 L 15 48 C 8 48, 0 43, 0 36 Z" fill="#E30613"/>
+        <path d="M 12 12 L 26 12 C 31 12, 34 14, 34 18 C 34 22, 31 24, 26 24 L 20 24 L 20 36 L 12 36 Z" fill="#FFFFFF"/>
+        <path d="M 20 18 L 26 18 C 28 18, 29 18.5, 29 19.5 C 29 20.5, 28 21, 26 21 L 20 21 Z" fill="#E30613"/>
+    </g>
+    <!-- Prysmian Group Brand Text -->
+    <text x="58" y="32" font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="900" fill="#FFFFFF" letter-spacing="0.5">Prysmian</text>
+    <text x="58" y="46" font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="700" fill="#38BDF8" letter-spacing="2.5">GROUP</text>
+</svg>

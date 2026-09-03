@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="card">
+    <h1>Plateforme démarrée</h1>
+    <p class="muted">API Symfony prête. Connexion JWT&nbsp;:</p>
+    <pre>POST /api/login_check
+{"email":"admin@prysmian.tn","password":"password123"}</pre>
+    <p>Pages : <a href="{{ path('app_login') }}">login web</a></p>
+    <h2>Endpoints</h2>
+    <ul>
+        <li><code>GET /api/dashboard</code></li>
+        <li><code>GET /api/cables</code></li>
+        <li><code>GET /api/alerts</code></li>
+        <li><code>GET /api/maintenances</code></li>
+        <li><code>GET /api/reports/monthly</code></li>
+        <li><code>POST /api/ml/batch</code></li>
+    </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accès refusé | Prysmian Tunisia{% endblock %}
+
+{% block body %}
+<style>
+    .access-page { min-height:60vh; display:grid; place-items:center; padding:2rem 1rem; }
+    .access-box { width:min(520px,100%); padding:2.5rem 2rem; background:#fff; border:1px solid #f0d3d0; border-top:4px solid #d94841; border-radius:12px; text-align:center; box-shadow:0 12px 32px #1d2b3514; }
+    .access-icon { width:58px; height:58px; display:grid; place-items:center; margin:0 auto 1rem; border-radius:50%; background:#fde5e3; color:#a3312c; font-size:1.7rem; font-weight:900; }
+    .access-box h1 { margin:.3rem 0 .7rem; font-size:1.55rem; color:#2c344d; }
+    .access-box p { margin:.45rem 0; color:#657079; line-height:1.5; }
+    .access-box strong { color:#a3312c; }
+    .back-button { display:inline-block; margin-top:1.2rem; padding:.7rem 1rem; border-radius:8px; background:#d94841; color:#fff; font-weight:800; text-decoration:none; }
+</style>
+<div class="access-page"><div class="access-box"><div class="access-icon">!</div><h1>Accès refusé</h1><p>L’espace <strong>{{ requestedSpace }}</strong> est réservé aux comptes administrateur.</p><p>Votre rôle actuel ne permet pas de consulter ou modifier les comptes utilisateurs.</p><a class="back-button" href="{{ path('app_home') }}">Retour au tableau de bord</a></div></div>
+{% endblock %}

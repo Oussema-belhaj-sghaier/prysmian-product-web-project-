@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Connexion — Prysmian Group Tunisia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --prysmian-red: #E30613;
+            --prysmian-navy: #0F172A;
+            --prysmian-blue: #0284C7;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 440px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+        }
+        .brand-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .brand-logo-img {
+            width: min(330px, 90%);
+            height: auto;
+            margin: 0 auto 12px;
+            display: block;
+        }
+        .title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--prysmian-navy);
+            margin: 0;
+        }
+        .subtitle {
+            font-size: 13px;
+            color: #64748B;
+            margin-top: 4px;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #CBD5E1;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .form-group input:focus {
+            border-color: var(--prysmian-blue);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--prysmian-navy);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+        .submit-btn:hover {
+            background: #1E293B;
+        }
+        .error-msg {
+            background: #FEE2E2;
+            color: #991B1B;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 1.25rem;
+            font-weight: 500;
+        }
+        .contact-footer { margin-top: 1.8rem; padding-top: 1rem; border-top: 1px solid #E2E8F0; text-align:center; color:#64748B; font-size:11px; line-height:1.6; }
+        .contact-footer strong { color:var(--prysmian-navy); }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="brand-header">
+            <img class="brand-logo-img" src="/images/prysmian_dashboard_logo.svg" alt="Prysmian Group">
+            <h1 class="title">Prysmian Group</h1>
+            <div class="subtitle">Smart Cable Management Platform — Tunisia</div>
+        </div>
+
+        {% if error %}
+            <div class="error-msg">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+
+        <form method="post">
+            <div class="form-group">
+                <label for="username">Adresse Email</label>
+                <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus placeholder="admin@prysmian.tn">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mot de Passe</label>
+                <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required placeholder="••••••••">
+            </div>
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+            <button type="submit" class="submit-btn">Se Connecter au Portail</button>
+        </form>
+
+        <div style="text-align:center;margin-top:1.25rem;font-size:13px;color:#64748B">
+            Pas encore de compte ? <a href="{{ path('app_register') }}" style="color:#0284C7;font-weight:700;text-decoration:none">Créer un compte</a>
+        </div>
+        <div class="contact-footer"><strong>Développé par Oussema Belhaj Sghaier</strong><br>Ingénieur à ESPRIT · Tél. 55 489 661 · oussemabelhajsghaier@gmail.com</div>
+    </div>
+</body>
+</html>

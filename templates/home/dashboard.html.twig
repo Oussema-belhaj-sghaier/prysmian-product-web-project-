@@ -1,0 +1,148 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Atelier de fabrication | Prysmian Tunisia{% endblock %}
+
+{% block body %}
+<style>
+    .dashboard-intro { display:flex; justify-content:space-between; align-items:flex-end; gap:1rem; margin-bottom:1.5rem; }
+    .dashboard-brand { width:180px; height:auto; margin-bottom:.65rem; }
+    .live-refresh { display:inline-flex; align-items:center; gap:.4rem; color:#657079; font-size:.72rem; margin-top:.6rem; }
+    .live-refresh i { width:7px; height:7px; border-radius:50%; background:#2d8a63; box-shadow:0 0 0 4px #2d8a6322; }
+    .eyebrow { color:#d94841; font-size:.72rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    .dashboard-intro h1 { margin:.35rem 0 .3rem; font-size:clamp(1.7rem,3vw,2.45rem); letter-spacing:-.04em; }
+    .dashboard-intro p { margin:0; color:#657079; }
+    .primary-button { display:inline-flex; align-items:center; gap:.5rem; border:0; border-radius:9px; padding:.75rem 1rem; background:#d94841; color:#fff; font-weight:800; cursor:pointer; text-decoration:none; box-shadow:0 8px 18px #d9484133; }
+    .primary-button:hover { background:#b93631; transform:translateY(-1px); }
+    .kpi-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1rem; margin-bottom:1.25rem; }
+    .kpi-card, .panel { background:#fff; border:1px solid #e3e7e8; border-radius:12px; box-shadow:0 8px 24px #1d2b3510; }
+    .kpi-card { padding:1.1rem 1.2rem; position:relative; overflow:hidden; }
+    .kpi-card:after { content:""; position:absolute; width:70px; height:70px; right:-28px; bottom:-30px; border:13px solid var(--accent); border-radius:50%; opacity:.14; }
+    .kpi-label { color:#657079; font-size:.78rem; font-weight:700; }
+    .kpi-value { margin:.55rem 0 .3rem; font-size:2rem; font-weight:850; letter-spacing:-.05em; }
+    .kpi-note { color:#77828a; font-size:.78rem; }
+    .dashboard-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr); gap:1.25rem; }
+    .panel { overflow:hidden; margin-bottom:1.25rem; }
+    .panel-heading { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1.1rem 1.25rem; border-bottom:1px solid #edf0f1; }
+    .panel-heading h2 { margin:0; font-size:1rem; }
+    .panel-heading span { color:#879198; font-size:.78rem; }
+    .panel-body { padding:1.25rem; }
+    .progress-row { margin-bottom:1rem; }
+    .progress-row:last-child { margin-bottom:0; }
+    .progress-label { display:flex; justify-content:space-between; margin-bottom:.4rem; font-size:.82rem; font-weight:700; }
+    .progress-track { height:8px; border-radius:9px; background:#edf0f1; overflow:hidden; }
+    .progress-fill { height:100%; border-radius:inherit; background:var(--fill,#d94841); }
+    .orders-table { width:100%; border-collapse:collapse; font-size:.82rem; }
+    .orders-table th { padding:.75rem 1.25rem; color:#879198; background:#fafbfb; text-align:left; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; }
+    .orders-table td { padding:.9rem 1.25rem; border-top:1px solid #f0f2f2; vertical-align:middle; }
+    .orders-table tr:hover { background:#fcf7f6; }
+    .code { color:#39464d; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:.78rem; font-weight:700; }
+    .badge { display:inline-flex; border-radius:999px; padding:.28rem .55rem; font-size:.68rem; font-weight:800; white-space:nowrap; }
+    .badge-good { color:#16704b; background:#e4f5ec; } .badge-warn { color:#996019; background:#fff1d7; } .badge-danger { color:#a3312c; background:#fde5e3; } .badge-neutral { color:#5e6a70; background:#edf0f1; }
+    .alert-list { display:grid; gap:.75rem; }
+    .alert-item { display:flex; gap:.75rem; align-items:flex-start; padding:.75rem; border:1px solid #edf0f1; border-left:3px solid var(--alert-color,#e1a33a); border-radius:8px; }
+    .alert-item strong { display:block; font-size:.82rem; } .alert-item small { display:block; color:#7c878d; margin-top:.2rem; line-height:1.4; }
+    .empty-state { color:#7c878d; padding:1.5rem 0; text-align:center; font-size:.85rem; }
+    .workspace-section { scroll-margin-top:90px; }
+    .compact-table { width:100%; border-collapse:collapse; font-size:.82rem; }
+    .compact-table th { padding:.75rem 1rem; color:#879198; background:#fafbfb; text-align:left; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; }
+    .compact-table td { padding:.85rem 1rem; border-top:1px solid #f0f2f2; }
+    .compact-table tr:hover { background:#fcf7f6; }
+    .product-thumb { width:48px; height:48px; object-fit:cover; border-radius:8px; background:#f0f2f2; vertical-align:middle; }
+    .product-placeholder { display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:8px; background:#f9e8e6; color:#b93631; font-weight:900; vertical-align:middle; }
+    .table-actions { display:flex; gap:.4rem; align-items:center; white-space:nowrap; }
+    .mini-button { border:1px solid #d7dddf; border-radius:7px; padding:.4rem .55rem; background:#fff; color:#59656c; font-size:.72rem; font-weight:800; cursor:pointer; }
+    .mini-button:hover { border-color:#d94841; color:#b93631; }
+    .mini-button.danger:hover { border-color:#c94a45; color:#a3312c; background:#fde5e3; }
+    .section-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1.25rem; }
+    .modal-overlay { display:none; position:fixed; inset:0; z-index:500; align-items:center; justify-content:center; padding:1rem; background:#1d2b3588; }
+    .modal-overlay.open { display:flex; } .modal-content { width:min(680px,100%); max-height:90vh; overflow:auto; padding:1.5rem; background:#fff; border-radius:12px; box-shadow:0 25px 70px #1d2b3544; }
+    .modal-content h2 { margin-top:0; } .modal-close { float:right; border:0; background:#f0f2f2; border-radius:50%; width:32px; height:32px; cursor:pointer; }
+    .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; } .form-group-full { grid-column:1/-1; }
+    .form-group-field label { display:block; margin-bottom:.35rem; color:#59656c; font-size:.72rem; font-weight:800; text-transform:uppercase; }
+    .form-group-field input, .form-group-field select, .form-group-field textarea { width:100%; padding:.7rem .75rem; border:1px solid #d7dddf; border-radius:7px; font:inherit; }
+    .form-actions { display:flex; justify-content:flex-end; gap:.6rem; margin-top:1.25rem; } .secondary-button { border:1px solid #d7dddf; border-radius:8px; padding:.7rem 1rem; background:#fff; color:#59656c; font-weight:700; cursor:pointer; }
+    @media (max-width:900px) { .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr));} .dashboard-grid{grid-template-columns:1fr;} }
+    @media (max-width:900px) { .section-grid{grid-template-columns:1fr;} }
+    @media (max-width:620px) { .dashboard-intro{align-items:flex-start; flex-direction:column;} .kpi-grid{grid-template-columns:1fr 1fr; gap:.65rem;} .kpi-card{padding:.9rem;} .kpi-value{font-size:1.55rem;} .orders-table{min-width:650px;} .panel-body:has(.orders-table){overflow-x:auto;} .form-grid{grid-template-columns:1fr;} .form-group-full{grid-column:auto;} }
+</style>
+
+<div class="dashboard-intro">
+    <div><img class="dashboard-brand" src="/images/prysmian_dashboard_logo.svg" alt="Prysmian Group"><div class="eyebrow">Prysmian Tunisia · usine</div><h1>Pilotage de la fabrication</h1><p>Une vue claire des références, des ordres de fabrication et de la qualité.</p><span class="live-refresh"><i></i><span id="liveStatus">Données synchronisées</span></span></div>
+    <button class="primary-button" type="button" onclick="openCreateOrderModal()">+ Nouvel ordre de fabrication</button>
+</div>
+
+<div class="kpi-grid">
+    <div class="kpi-card" style="--accent:#d94841"><div class="kpi-label">Références catalogue</div><div class="kpi-value" id="liveProducts">{{ stats.total }}</div><div class="kpi-note">{{ stats.inProduction }} en fabrication</div></div>
+    <div class="kpi-card" style="--accent:#2d8a63"><div class="kpi-label">Stock disponible</div><div class="kpi-value" id="liveStock">{{ stats.totalStockMeters|number_format(0, ',', ' ') }} m</div><div class="kpi-note"><span id="liveLowStock">{{ stats.lowStock }}</span> référence(s) sous le seuil</div></div>
+    <div class="kpi-card" style="--accent:#e1a33a"><div class="kpi-label">Ordres en cours</div><div class="kpi-value" id="liveOrders">{{ stats.ordersInProgress + stats.ordersPlanned }}</div><div class="kpi-note">{{ stats.ordersDone }} terminé(s) ce cycle</div></div>
+    <div class="kpi-card" style="--accent:#51788d"><div class="kpi-label">Conformité qualité</div><div class="kpi-value">{{ stats.qcRate }}%</div><div class="kpi-note">{{ stats.qcHold }} référence(s) en contrôle</div></div>
+</div>
+
+<div class="dashboard-grid">
+    <div>
+        <section class="panel"><div class="panel-heading"><h2>Ordres de fabrication récents</h2><span>{{ maintenances|length }} ordre(s)</span></div><div class="panel-body" style="padding:0"><table class="orders-table"><thead><tr><th>Ordre</th><th>Référence</th><th>Étape</th><th>Avancement</th><th>État</th></tr></thead><tbody>
+        {% for order in maintenances|slice(0, 8) %}{% set orderStatus = order.resultStatus.value %}{% set progress = order.yieldPercent ?? (orderStatus == 'DONE' ? 100 : (orderStatus == 'IN_PROGRESS' ? 55 : 15)) %}<tr><td class="code">{{ order.orderNumber ?: 'OF-' ~ order.id|slice(0, 6) }}</td><td><strong>{{ order.cable.referenceCode }}</strong><br><small>{{ order.cable.designation }}</small></td><td>{{ order.maintenanceType.value|replace({'_':' '}) }}</td><td style="min-width:120px"><div class="progress-track"><div class="progress-fill" style="width:{{ min(progress, 100) }}%;--fill:{{ orderStatus == 'REJECTED' ? '#c94a45' : '#d94841' }}"></div></div><small>{{ progress|number_format(0) }}%</small></td><td><span class="badge {{ orderStatus == 'DONE' ? 'badge-good' : (orderStatus == 'REJECTED' ? 'badge-danger' : (orderStatus == 'PLANNED' ? 'badge-neutral' : 'badge-warn')) }}">{{ orderStatus|replace({'_':' '}) }}</span></td></tr>{% else %}<tr><td colspan="5" class="empty-state">Aucun ordre de fabrication enregistré.</td></tr>{% endfor %}
+        </tbody></table></div></section>
+        <section class="panel"><div class="panel-heading"><h2>Références à surveiller</h2><span>Stock et contrôle qualité</span></div><div class="panel-body"><div class="alert-list">{% set monitored = false %}{% for cable in cables %}{% if cable.isLowStock or cable.status.value == 'QC_HOLD' %}{% set monitored = true %}<div class="alert-item" style="--alert-color:{{ cable.status.value == 'QC_HOLD' ? '#c94a45' : '#e1a33a' }}"><div><strong>{{ cable.referenceCode }} · {{ cable.designation }}</strong><small>{{ cable.status.value == 'QC_HOLD' ? 'Bloqué pour contrôle qualité' : 'Stock faible : ' ~ (cable.stockMeters|number_format(0, ',', ' ') ~ ' m disponible(s)') }}</small></div></div>{% endif %}{% endfor %}{% if not monitored %}<div class="empty-state">Aucune référence ne nécessite d’action immédiate.</div>{% endif %}</div></div></section>
+    </div>
+    <aside>
+        <section class="panel"><div class="panel-heading"><h2>Répartition des familles</h2><span>{{ stats.total }} références</span></div><div class="panel-body">{% for family, count in stats.byFamily %}<div class="progress-row"><div class="progress-label"><span>{{ family }}</span><span>{{ count }}</span></div><div class="progress-track"><div class="progress-fill" style="width:{{ stats.total ? (count / stats.total * 100) : 0 }}%;--fill:{{ loop.index is even ? '#51788d' : '#d94841' }}"></div></div></div>{% endfor %}</div></section>
+        <section class="panel"><div class="panel-heading"><h2>Alertes atelier</h2><span class="badge {{ stats.openAlerts ? 'badge-danger' : 'badge-good' }}">{{ stats.openAlerts }} ouverte(s)</span></div><div class="panel-body"><div class="alert-list">{% for alert in alerts|slice(0, 5) %}<div class="alert-item" style="--alert-color:{{ alert.severity.value == 'CRITICAL' ? '#c94a45' : '#e1a33a' }}"><div><strong>{{ alert.alertType.value }} · {{ alert.cable.referenceCode }}</strong><small>{{ alert.message }}</small></div></div>{% else %}<div class="empty-state">Aucune alerte récente.</div>{% endfor %}</div></div></section>
+    </aside>
+</div>
+
+<div class="section-grid">
+    <section id="catalogue" class="panel workspace-section">
+        <div class="panel-heading">
+            <h2>Catalogue produits</h2>
+            <div style="display:flex;align-items:center;gap:.7rem"><span>{{ stats.total }} référence(s)</span><button class="primary-button" type="button" onclick="openProductModal()">+ Ajouter</button></div>
+        </div>
+        <div class="panel-body" style="padding:0;overflow:auto">
+            <table class="compact-table">
+                <thead><tr><th>Produit</th><th>Désignation</th><th>Famille</th><th>Stock</th><th>Usine</th><th>Statut</th><th>Actions</th></tr></thead>
+                <tbody>
+                {% for cable in cables %}
+                    {% set productId = cable.id %}
+                    {% set productStatus = cable.status.value %}
+                    <tr>
+                        <td><a href="#" onclick="openProductDetails(event, '{{ productId }}')" style="text-decoration:none;color:inherit"><img class="product-thumb" src="{{ cable.imagePath ?: '/images/product-default.svg' }}" alt="{{ cable.designation }}"></a> <span class="code">{{ cable.referenceCode }}</span></td>
+                        <td>{{ cable.designation }}</td>
+                        <td>{{ cable.cableType.value }}</td>
+                        <td>{{ cable.stockMeters|number_format(0, ',', ' ') }} m</td>
+                        <td>{{ cable.factory ?: '—' }}</td>
+                        <td><span class="badge {{ productStatus == 'IN_STOCK' ? 'badge-good' : (productStatus == 'QC_HOLD' ? 'badge-danger' : 'badge-warn') }}">{{ productStatus|replace({'_':' '}) }}</span></td>
+                        <td><div class="table-actions"><button class="mini-button" type="button" onclick="openProductModal('{{ productId }}')">Modifier</button><form action="/cable/{{ productId }}/delete" method="post"><button class="mini-button danger" type="submit">Supprimer</button></form></div></td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="7" class="empty-state">Aucune référence dans le catalogue.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <section id="production" class="panel workspace-section"><div class="panel-heading"><h2>Ordres de fabrication</h2><button class="primary-button" type="button" onclick="openCreateOrderModal()">+ Créer</button></div><div class="panel-body" style="padding:0;overflow:auto"><table class="compact-table"><thead><tr><th>Ordre</th><th>Produit</th><th>Étape</th><th>État</th></tr></thead><tbody>{% for order in maintenances|slice(0, 8) %}<tr><td class="code">{{ order.orderNumber ?: 'OF-' ~ order.id|slice(0, 6) }}</td><td>{{ order.cable.referenceCode }}</td><td>{{ order.maintenanceType.value }}</td><td><span class="badge {{ order.resultStatus.value == 'DONE' ? 'badge-good' : (order.resultStatus.value == 'REJECTED' ? 'badge-danger' : 'badge-warn') }}">{{ order.resultStatus.value|replace({'_':' '}) }}</span></td></tr>{% else %}<tr><td colspan="4" class="empty-state">Aucun ordre de fabrication.</td></tr>{% endfor %}</tbody></table></div></section>
+    <section id="alertes" class="panel workspace-section"><div class="panel-heading"><h2>Alertes qualité</h2><span>{{ stats.openAlerts }} ouverte(s)</span></div><div class="panel-body"><div class="alert-list">{% for alert in alerts|slice(0, 6) %}<div class="alert-item" style="--alert-color:{{ alert.severity.value == 'CRITICAL' ? '#c94a45' : '#e1a33a' }}"><div><strong>{{ alert.alertType.value }} · {{ alert.cable.referenceCode }}</strong><small>{{ alert.message }}</small></div></div>{% else %}<div class="empty-state">Aucune alerte qualité.</div>{% endfor %}</div></div></section>
+    <section id="qualite" class="panel workspace-section"><div class="panel-heading"><h2>Analyse qualité</h2><span>{{ predictions|length }} analyse(s)</span></div><div class="panel-body"><div class="alert-list">{% for prediction in predictions|slice(0, 6) %}<div class="alert-item" style="--alert-color:#51788d"><div><strong>{{ prediction.cable.referenceCode }} · confiance {{ (prediction.confidenceScore * 100)|round }}%</strong><small>{{ prediction.reason }} · échéance {{ prediction.predictedDate|date('d/m/Y') }}</small></div></div>{% else %}<div class="empty-state">Aucune prédiction disponible.</div>{% endfor %}</div></div></section>
+    <section id="utilisateurs" class="panel workspace-section" style="grid-column:1/-1"><div class="panel-heading"><h2>Équipe de production</h2><div style="display:flex;align-items:center;gap:.7rem"><span>{{ allUsers|length }} utilisateur(s)</span><button class="primary-button" type="button" onclick="openUserModal()">+ Ajouter</button></div></div><div class="panel-body" style="padding:0;overflow:auto"><table class="compact-table"><thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Statut</th><th>Actions</th></tr></thead><tbody>{% for member in allUsers %}<tr><td><strong>{{ member.fullName }}</strong></td><td>{{ member.email }}</td><td>{{ member.role.value }}</td><td><span class="badge {{ member.status.value == 'ACTIVE' ? 'badge-good' : 'badge-neutral' }}">{{ member.status.value }}</span></td><td><div class="table-actions"><button class="mini-button" type="button" onclick="openUserModal('{{ member.id }}')">Modifier</button><form action="/user/{{ member.id }}/delete" method="post" onsubmit="return confirm('Supprimer ce compte ?')"><button class="mini-button danger" type="submit">Supprimer</button></form></div></td></tr>{% else %}<tr><td colspan="5" class="empty-state">Aucun utilisateur.</td></tr>{% endfor %}</tbody></table></div></section>
+</div>
+
+<div id="createOrderModal" class="modal-overlay"><div class="modal-content"><button class="modal-close" type="button" onclick="closeCreateOrderModal()">×</button><h2>Nouvel ordre de fabrication</h2><form action="{{ path('app_maintenance_create') }}" method="post"><div class="form-grid"><div class="form-group-field form-group-full"><label>Référence produit</label><select name="cableId" required>{% for cable in cables %}<option value="{{ cable.id }}">{{ cable.referenceCode }} · {{ cable.designation }}</option>{% endfor %}</select></div><div class="form-group-field"><label>Étape de production</label><select name="maintenanceType" required><option value="EXTRUSION">Extrusion</option><option value="STRANDING">Toronnage</option><option value="ARMORING">Armurage</option><option value="TESTING">Tests électriques</option><option value="PACKAGING">Bobinage / emballage</option></select></div><div class="form-group-field"><label>Statut</label><select name="resultStatus" required><option value="PLANNED">Planifié</option><option value="IN_PROGRESS">En cours</option><option value="QC_CHECK">Contrôle qualité</option><option value="DONE">Terminé</option></select></div><div class="form-group-field"><label>N° ordre</label><input name="orderNumber" placeholder="OF-2026-0042"></div><div class="form-group-field"><label>Longueur cible (m)</label><input name="targetLengthMeters" type="number" min="0" step=".01"></div><div class="form-group-field"><label>Coût de production (TND)</label><input name="cost" type="number" min="0" step=".01" value="0"></div><div class="form-group-field form-group-full"><label>Instructions de fabrication</label><textarea name="description" rows="3" required placeholder="Lot, paramètres de ligne, consignes qualité..."></textarea></div></div><div class="form-actions"><button class="secondary-button" type="button" onclick="closeCreateOrderModal()">Annuler</button><button class="primary-button" type="submit">Créer l'ordre</button></div></form></div></div>
+<div id="productModal" class="modal-overlay"><div class="modal-content"><button class="modal-close" type="button" onclick="closeProductModal()">×</button><h2 id="productModalTitle">Ajouter une référence</h2><form id="productForm" action="{{ path('app_cable_create') }}" method="post" enctype="multipart/form-data"><div class="form-grid"><div class="form-group-field"><label>Référence produit</label><input id="productReference" name="referenceCode" required placeholder="PRY-MT-150-3X"></div><div class="form-group-field"><label>Désignation</label><input id="productDesignation" name="designation" required placeholder="Câble MT 20kV..."></div><div class="form-group-field"><label>Famille</label><select id="productType" name="cableType" required><option value="HT">Haute tension</option><option value="MT">Moyenne tension</option><option value="BT">Basse tension</option><option value="FIBER">Fibre optique</option><option value="SUBMARINE">Sous-marin</option><option value="SPECIAL">Spécial industriel</option></select></div><div class="form-group-field"><label>Statut</label><select id="productStatus" name="status" required><option value="IN_STOCK">En stock</option><option value="IN_PRODUCTION">En production</option><option value="QC_HOLD">Contrôle qualité</option><option value="OUT_OF_STOCK">Rupture</option><option value="DISCONTINUED">Arrêté</option></select></div><div class="form-group-field"><label>Stock (m)</label><input id="productStock" name="stockMeters" type="number" min="0" step=".01" value="0"></div><div class="form-group-field"><label>Seuil d'alerte (m)</label><input id="productThreshold" name="stockAlertThreshold" type="number" min="0" step=".01" value="1000"></div><div class="form-group-field"><label>Usine</label><input id="productFactory" name="factory" placeholder="Usine Bizerte"></div><div class="form-group-field"><label>Prix / m</label><input id="productPrice" name="pricePerMeter" type="number" min="0" step=".01"></div><div class="form-group-field"><label>Tension nominale (kV)</label><input id="productVoltage" name="nominalVoltage" type="number" min="0" step=".01"></div><div class="form-group-field"><label>Section conducteur (mm²)</label><input id="productSection" name="conductorSection" type="number" min="0" step=".01"></div><div class="form-group-field"><label>Matériau conducteur</label><select id="productMaterial" name="conductorMaterial"><option value="COPPER">Cuivre</option><option value="ALUMINUM">Aluminium</option></select></div><div class="form-group-field"><label>Isolation</label><input id="productInsulation" name="insulation" value="XLPE"></div><div class="form-group-field form-group-full"><label>Image produit</label><input name="image" type="file" accept="image/jpeg,image/png,image/webp"><small style="display:block;color:#77828a;margin-top:.35rem">JPG, PNG ou WEBP, maximum recommandé 5 Mo.</small></div><div class="form-group-field form-group-full"><label>Description technique</label><textarea id="productDescription" name="description" rows="3" placeholder="Construction, normes et usage du produit..."></textarea></div></div><div class="form-actions"><button class="secondary-button" type="button" onclick="closeProductModal()">Annuler</button><button class="primary-button" type="submit">Enregistrer la référence</button></div></form></div></div>
+<div id="productDetailsModal" class="modal-overlay"><div class="modal-content"><button class="modal-close" type="button" onclick="closeProductDetails()">×</button><h2>Détails du produit</h2><div id="productDetailsContent"></div></div></div>
+<div id="userModal" class="modal-overlay"><div class="modal-content"><button class="modal-close" type="button" onclick="closeUserModal()">×</button><h2 id="userModalTitle">Ajouter un utilisateur</h2><form id="userForm" action="{{ path('app_user_create') }}" method="post"><div class="form-grid"><div class="form-group-field"><label>Prénom</label><input id="userFirstName" name="firstName" required></div><div class="form-group-field"><label>Nom</label><input id="userLastName" name="lastName" required></div><div class="form-group-field form-group-full"><label>Email</label><input id="userEmail" name="email" type="email" required></div><div class="form-group-field"><label>Rôle</label><select id="userRole" name="role"><option value="TECHNICIAN">Technicien</option><option value="SUPERVISOR">Superviseur</option><option value="ADMIN">Administrateur</option></select></div><div class="form-group-field"><label>Statut</label><select id="userStatus" name="status"><option value="ACTIVE">Actif</option><option value="INACTIVE">Inactif</option></select></div><div class="form-group-field"><label>Téléphone</label><input id="userPhone" name="phone"></div><div class="form-group-field"><label>Atelier</label><input id="userRegion" name="regionAssigned" placeholder="Usine Bizerte"></div></div><div class="form-actions"><button class="secondary-button" type="button" onclick="closeUserModal()">Annuler</button><button class="primary-button" type="submit">Enregistrer</button></div></form></div></div>
+<script>
+async function refreshLiveData(){try{const response=await fetch('{{ path('app_dashboard_live') }}',{headers:{Accept:'application/json'}});if(!response.ok)throw new Error('live');const data=await response.json();document.getElementById('liveProducts').textContent=data.products;document.getElementById('liveStock').textContent=new Intl.NumberFormat('fr-FR').format(data.stockMeters)+' m';document.getElementById('liveLowStock').textContent=data.lowStock;document.getElementById('liveOrders').textContent=data.activeOrders;document.getElementById('liveStatus').textContent='Synchronisé à '+new Date(data.updatedAt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}catch(error){document.getElementById('liveStatus').textContent='Mode hors ligne · dernière vue conservée';}}
+refreshLiveData();setInterval(refreshLiveData,30000);
+const products = {{ productData|json_encode|raw }};
+const users = {{ userData|json_encode|raw }};
+function openCreateOrderModal(){document.getElementById('createOrderModal').classList.add('open')}
+function closeCreateOrderModal(){document.getElementById('createOrderModal').classList.remove('open')}
+function openProductModal(id){const product=products.find(item=>item.id===id);const form=document.getElementById('productForm');document.getElementById('productModalTitle').innerText=product?'Modifier la référence':'Ajouter une référence';form.action=product?'/cable/'+id+'/edit':'{{ path('app_cable_create') }}';document.getElementById('productReference').value=product?.reference||'';document.getElementById('productReference').readOnly=false;document.getElementById('productDesignation').value=product?.designation||'';document.getElementById('productType').value=product?.type||'MT';document.getElementById('productStatus').value=product?.status||'IN_STOCK';document.getElementById('productStock').value=product?.stock||0;document.getElementById('productFactory').value=product?.factory||'';document.getElementById('productDescription').value=product?.description||'';document.getElementById('productSection').value=product?.section||'';document.getElementById('productInsulation').value=product?.insulation||'XLPE';document.getElementById('productModal').classList.add('open')}
+function closeProductModal(){document.getElementById('productModal').classList.remove('open')}
+function openProductDetails(event,id){event.preventDefault();const product=products.find(item=>item.id===id);document.getElementById('productDetailsContent').innerHTML='<strong>'+product.reference+'</strong><p>'+product.designation+'</p><p>Famille : '+product.type+'<br>Stock : '+(product.stock||0)+' m<br>Usine : '+(product.factory||'Non renseignée')+'<br>Isolation : '+(product.insulation||'Non renseignée')+'</p><p>'+(product.description||'Aucune description technique.')+'</p>';document.getElementById('productDetailsModal').classList.add('open')}
+function closeProductDetails(){document.getElementById('productDetailsModal').classList.remove('open')}
+function openUserModal(id){const user=users.find(item=>item.id===id);const form=document.getElementById('userForm');document.getElementById('userModalTitle').innerText=user?'Modifier utilisateur':'Ajouter un utilisateur';form.action=user?'/user/'+id+'/edit':'{{ path('app_user_create') }}';document.getElementById('userFirstName').value=user?.firstName||'';document.getElementById('userLastName').value=user?.lastName||'';document.getElementById('userEmail').value=user?.email||'';document.getElementById('userEmail').readOnly=!!user;document.getElementById('userRole').value=user?.role||'TECHNICIAN';document.getElementById('userStatus').value=user?.status||'ACTIVE';document.getElementById('userPhone').value=user?.phone||'';document.getElementById('userRegion').value=user?.region||'';document.getElementById('userModal').classList.add('open')}
+function closeUserModal(){document.getElementById('userModal').classList.remove('open')}
+document.querySelectorAll('.modal-overlay').forEach(modal=>modal.addEventListener('click',event=>{if(event.target===modal)modal.classList.remove('open')}))
+</script>
+{% endblock %}

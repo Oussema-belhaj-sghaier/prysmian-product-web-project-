@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 100" role="img" aria-label="Prysmian Group">
+  <path d="M12 18c0-10 8-18 18-18h38c22 0 38 16 38 38s-16 38-38 38H52v24H12V18Zm40 36h15c9 0 14-5 14-13s-5-13-14-13H52v26Z" fill="#08c96b"/>
+  <path d="M52 54h24c18 0 30-7 30-20 0-11-7-18-18-20 7 4 10 10 10 18 0 15-13 22-32 22H52v24H12v22h40V54Z" fill="#0698ee"/>
+  <text x="132" y="68" font-family="Arial, sans-serif" font-size="62" font-weight="700" fill="#2c344d">Prysmian</text>
+  <text x="136" y="91" font-family="Arial, sans-serif" font-size="16" font-weight="700" letter-spacing="7" fill="#2c344d">GROUP</text>
+</svg>

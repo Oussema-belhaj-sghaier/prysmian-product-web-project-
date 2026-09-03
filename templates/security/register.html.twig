@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Créer un compte — Prysmian Group Tunisia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --prysmian-red: #E30613;
+            --prysmian-navy: #0F172A;
+            --prysmian-blue: #0284C7;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .register-card {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 520px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+        }
+        .brand-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .brand-logo-img {
+            width: min(300px, 90%);
+            height: auto;
+            margin: 0 auto 10px;
+            display: block;
+        }
+        .title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--prysmian-navy);
+            margin: 0;
+        }
+        .subtitle {
+            font-size: 13px;
+            color: #64748B;
+            margin-top: 4px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .form-group-full {
+            grid-column: span 2;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 11px 13px;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--prysmian-blue);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 13px;
+            background: var(--prysmian-navy);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 15px;
+        }
+        .submit-btn:hover {
+            background: #1E293B;
+        }
+        .error-msg {
+            background: #FEE2E2;
+            color: #991B1B;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 1.25rem;
+            font-weight: 500;
+        }
+        .login-link-box {
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 13px;
+            color: #64748B;
+        }
+        .login-link-box a {
+            color: var(--prysmian-blue);
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .contact-footer { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #E2E8F0; text-align:center; color:#64748B; font-size:11px; line-height:1.6; }
+        .contact-footer strong { color:var(--prysmian-navy); }
+    </style>
+</head>
+<body>
+    <div class="register-card">
+        <div class="brand-header">
+            <img class="brand-logo-img" src="/images/prysmian_dashboard_logo.svg" alt="Prysmian Group">
+            <h1 class="title">Créer un Compte</h1>
+            <div class="subtitle">Smart Cable Management Platform — Prysmian Tunisia</div>
+        </div>
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="error-msg">{{ message }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        <form method="post" action="{{ path('app_register') }}" enctype="multipart/form-data">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="firstName">Prénom</label>
+                    <input type="text" name="firstName" id="firstName" required placeholder="Karim">
+                </div>
+
+                <div class="form-group">
+                    <label for="lastName">Nom</label>
+                    <input type="text" name="lastName" id="lastName" required placeholder="Ben Ali">
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="email">Adresse Email</label>
+                    <input type="email" name="email" id="email" required placeholder="technicien@prysmian.tn">
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="password">Mot de Passe</label>
+                    <input type="password" name="password" id="password" required placeholder="••••••••">
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Rôle Utilisateur</label>
+                    <select name="role" id="role" required>
+                        <option value="TECHNICIAN" selected>Technicien</option>
+                        <option value="SUPERVISOR">Superviseur</option>
+                        <option value="ADMIN">Administrateur</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="regionAssigned">Région Affectée</label>
+                    <select name="regionAssigned" id="regionAssigned">
+                        <option value="">Toutes les régions</option>
+                        <option value="Tunis">Tunis</option>
+                        <option value="Sfax">Sfax</option>
+                        <option value="Sousse">Sousse</option>
+                        <option value="Kairouan">Kairouan</option>
+                        <option value="Gabès">Gabès</option>
+                        <option value="Djerba">Djerba</option>
+                        <option value="Bizerte">Bizerte</option>
+                        <option value="Nabeul">Nabeul</option>
+                        <option value="Monastir">Monastir</option>
+                        <option value="Mahdia">Mahdia</option>
+                    </select>
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="phone">Téléphone</label>
+                    <input type="text" name="phone" id="phone" placeholder="+216 71 123 456">
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="profileImage">Photo de profil</label>
+                    <input type="file" name="profileImage" id="profileImage" accept="image/jpeg,image/png,image/webp">
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Inscrire mon Compte</button>
+        </form>
+
+        <div class="login-link-box">
+            Déjà inscrit ? <a href="{{ path('app_login') }}">Se connecter</a>
+        </div>
+        <div class="contact-footer"><strong>Développé par Oussema Belhaj Sghaier</strong><br>Ingénieur à ESPRIT · Tél. 55 489 661 · oussemabelhajsghaier@gmail.com</div>
+    </div>
+</body>
+</html>
