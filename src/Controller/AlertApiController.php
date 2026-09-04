@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Alert;
+use App\Enum\UserRole;
 use App\Enum\AlertStatus;
 use App\Repository\AlertRepository;
+use App\Repository\UserRepository;
+use App\Service\PlantMailerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -60,5 +63,21 @@ class AlertApiController extends AbstractController
             ->setResolution($data['resolution'] ?? 'Résolu sans commentaire');
         $em->flush();
         return $this->json(['message' => 'Alerte résolue']);
+    }
+
+    #[Route('/{id}/notify', name: 'api_alerts_notify', methods: ['POST'])]
+    public function notify(Alert $alert, UserRepository $userRepository, \Symfony\Component\DependencyInjection\ContainerInterface $container): JsonResponse
+    {
+        $recipients = array_map(
+            static fn ($user): string => $user->getEmail(),
+            array_merge($userRepository->findByRole(UserRole::ADMIN), $userRepository->findByRole(UserRole::SUPERVISOR)),
+        );
+        if (($_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? 'dev') === 'dev') {
+            return $this->json(['message' => 'Notification simulée en environnement local', 'status' => 'local_mode', 'recipients' => count($recipients)]);
+        }
+
+        $deliveryStatus = $container->get(PlantMailerService::class)->sendAlert($alert, $recipients);
+
+        return $this->json(['message' => 'Notification traitée', 'status' => $deliveryStatus, 'recipients' => count($recipients)]);
     }
 }

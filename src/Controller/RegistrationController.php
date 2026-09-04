@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use App\Repository\UserRepository;
+use App\Service\PlantMailerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +25,7 @@ class RegistrationController extends AbstractController
         UserRepository $userRepo,
         UserPasswordHasherInterface $hasher,
         EntityManagerInterface $em,
+        PlantMailerService $mailer,
     ): Response {
         if ($this->getUser()) {
             return $this->redirectToRoute('app_home');
@@ -60,6 +62,7 @@ class RegistrationController extends AbstractController
 
             $em->persist($user);
             $em->flush();
+            $mailer->sendWelcome($user);
 
             $this->addFlash('success', "Votre compte a été créé avec succès ! Veuillez vous connecter.");
             return $this->redirectToRoute('app_login');

@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\PlantMailerService;
 
 #[Route('/user')]
 class UserCrudController extends AbstractController
@@ -25,6 +26,7 @@ class UserCrudController extends AbstractController
         UserRepository $userRepo,
         UserPasswordHasherInterface $hasher,
         EntityManagerInterface $em,
+        PlantMailerService $mailer,
     ): Response {
         $email = trim((string) $request->request->get('email'));
         $firstName = trim((string) $request->request->get('firstName'));
@@ -54,6 +56,7 @@ class UserCrudController extends AbstractController
 
         $em->persist($user);
         $em->flush();
+        $mailer->sendWelcome($user);
 
         $this->addFlash('success', "Utilisateur {$user->getFullName()} créé avec succès.");
         return $this->redirectToRoute('app_home');

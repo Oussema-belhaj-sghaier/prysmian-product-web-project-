@@ -52,6 +52,7 @@ security:
         - { path: ^/api/maintenances, roles: [ROLE_ADMIN, ROLE_TECHNICIAN] }
         - { path: ^/api/alerts, roles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_TECHNICIAN] }
         - { path: ^/api/ml, roles: [ROLE_ADMIN, ROLE_SUPERVISOR] }
+        - { path: ^/api/ai, roles: [ROLE_ADMIN, ROLE_SUPERVISOR] }
         - { path: ^/api/reports, roles: [ROLE_ADMIN, ROLE_SUPERVISOR] }
         - { path: ^/api/users, roles: ROLE_ADMIN }
         - { path: ^/api/dashboard, roles: [ROLE_ADMIN, ROLE_SUPERVISOR, ROLE_TECHNICIAN] }
