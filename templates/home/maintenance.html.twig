@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Suivi maintenance | Prysmian Tunisia{% endblock %}
+
+{% block body %}
+<style>
+    .maintenance-head { display:flex; justify-content:space-between; align-items:flex-end; gap:1rem; margin-bottom:1.5rem; }
+    .maintenance-head h1 { margin:.35rem 0 .3rem; font-size:2rem; }
+    .maintenance-head p { margin:0; color:#657079; }
+    .eyebrow { color:#d94841; font-size:.72rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    .maintenance-button { display:inline-flex; align-items:center; border-radius:8px; padding:.7rem 1rem; background:#d94841; color:#fff; font-weight:800; text-decoration:none; }
+    .maintenance-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1rem; margin-bottom:1.25rem; }
+    .summary-card, .maintenance-table-wrap { background:#fff; border:1px solid #e3e7e8; border-radius:10px; box-shadow:0 8px 24px #1d2b3510; }
+    .summary-card { padding:1rem 1.1rem; }
+    .summary-card span { display:block; color:#77828a; font-size:.78rem; font-weight:700; }
+    .summary-card strong { display:block; margin-top:.4rem; font-size:1.7rem; }
+    .maintenance-table-wrap { overflow:auto; }
+    .maintenance-table { width:100%; border-collapse:collapse; font-size:.84rem; }
+    .maintenance-table th { padding:.8rem 1rem; color:#77828a; background:#fafbfb; text-align:left; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; }
+    .maintenance-table td { padding:.9rem 1rem; border-top:1px solid #f0f2f2; }
+    .maintenance-table tr:hover { background:#fcf7f6; }
+    .status { display:inline-flex; border-radius:999px; padding:.28rem .55rem; font-size:.68rem; font-weight:800; }
+    .status-planned, .status-qc { color:#996019; background:#fff1d7; }
+    .status-progress { color:#51788d; background:#e5f0f5; }
+    .status-done { color:#16704b; background:#e4f5ec; }
+    .status-rejected { color:#a3312c; background:#fde5e3; }
+    .maintenance-empty { padding:2.5rem; text-align:center; color:#77828a; }
+    @media (max-width:850px) { .maintenance-summary { grid-template-columns:repeat(2,minmax(0,1fr)); } .maintenance-head { align-items:flex-start; flex-direction:column; } }
+    @media (max-width:500px) { .maintenance-summary { grid-template-columns:1fr; } }
+</style>
+
+{% set planned = 0 %}
+{% set active = 0 %}
+{% set done = 0 %}
+{% set totalCost = 0 %}
+{% for order in maintenances %}
+    {% set totalCost = totalCost + order.cost %}
+    {% if order.resultStatus.value == 'PLANNED' %}{% set planned = planned + 1 %}{% endif %}
+    {% if order.resultStatus.value in ['IN_PROGRESS', 'QC_CHECK'] %}{% set active = active + 1 %}{% endif %}
+    {% if order.resultStatus.value == 'DONE' %}{% set done = done + 1 %}{% endif %}
+{% endfor %}
+
+<div class="maintenance-head">
+    <div><div class="eyebrow">Prysmian Tunisia · production</div><h1>Suivi maintenance</h1><p>Suivez les ordres de fabrication et les opérations en cours.</p></div>
+    <a class="maintenance-button" href="{{ path('app_production') }}">Gérer les ordres</a>
+</div>
+
+<div class="maintenance-summary">
+    <div class="summary-card"><span>Ordres planifiés</span><strong>{{ planned }}</strong></div>
+    <div class="summary-card"><span>En cours / contrôle</span><strong>{{ active }}</strong></div>
+    <div class="summary-card"><span>Terminés</span><strong>{{ done }}</strong></div>
+    <div class="summary-card"><span>Coût cumulé</span><strong>{{ totalCost|number_format(2, ',', ' ') }} TND</strong></div>
+</div>
+
+<div class="maintenance-table-wrap">
+    <table class="maintenance-table">
+        <thead><tr><th>Ordre</th><th>Produit</th><th>Étape</th><th>Début</th><th>Rendement</th><th>Coût</th><th>État</th></tr></thead>
+        <tbody>
+        {% for order in maintenances %}
+            {% set orderStatus = order.resultStatus.value %}
+            {% set statusLabel = {'PLANNED':'Planifié','IN_PROGRESS':'En cours','QC_CHECK':'Contrôle qualité','DONE':'Terminé','REJECTED':'Rejeté'}[orderStatus] ?? orderStatus %}
+            {% set typeLabel = {'EXTRUSION':'Extrusion','STRANDING':'Toronnage','ARMORING':'Armurage','TESTING':'Tests électriques','PACKAGING':'Emballage'}[order.maintenanceType.value] ?? order.maintenanceType.value %}
+            <tr>
+                <td><strong>{{ order.orderNumber ?: 'OF-' ~ order.id|slice(0, 6) }}</strong></td>
+                <td>{{ order.cable.referenceCode }}<br><small>{{ order.cable.designation }}</small></td>
+                <td>{{ typeLabel }}</td>
+                <td>{{ order.startDate|date('d/m/Y H:i') }}</td>
+                <td>{{ order.yieldPercent is not null ? order.yieldPercent ~ '%' : 'Non renseigné' }}</td>
+                <td>{{ order.cost|number_format(2, ',', ' ') }} TND</td>
+                <td><span class="status {{ orderStatus == 'DONE' ? 'status-done' : (orderStatus == 'REJECTED' ? 'status-rejected' : (orderStatus == 'IN_PROGRESS' ? 'status-progress' : 'status-planned')) }}">{{ statusLabel }}</span></td>
+            </tr>
+        {% else %}
+            <tr><td colspan="7" class="maintenance-empty">Aucun ordre de fabrication n’est encore enregistré.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
