@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contacts Prysmian | Prysmian Tunisia{% endblock %}
+
+{% block body %}
+<style>
+    .contacts-head { display:flex; justify-content:space-between; align-items:flex-end; gap:1rem; margin-bottom:1.5rem; }
+    .contacts-head h1 { margin:.35rem 0 .3rem; font-size:2rem; }
+    .contacts-head p { margin:0; color:#657079; }
+    .eyebrow { color:#d94841; font-size:.72rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    .contacts-actions { display:flex; gap:.6rem; }
+    .contacts-button { display:inline-flex; align-items:center; gap:.4rem; border:1px solid #d7dddf; border-radius:8px; padding:.7rem 1rem; background:#fff; color:#59656c; font-weight:800; text-decoration:none; }
+    .contacts-button.primary { border-color:#d94841; background:#d94841; color:#fff; }
+    .contacts-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:1rem; }
+    .contact-card { background:#fff; border:1px solid #e3e7e8; border-radius:10px; padding:1.1rem; box-shadow:0 8px 24px #1d2b3510; }
+    .contact-top { display:flex; align-items:center; gap:.8rem; margin-bottom:1rem; }
+    .contact-avatar { display:flex; align-items:center; justify-content:center; width:48px; height:48px; flex:0 0 48px; border-radius:50%; background:#f9e8e6; color:#b93631; font-weight:900; overflow:hidden; }
+    .contact-avatar img { width:100%; height:100%; object-fit:cover; }
+    .contact-top h2 { margin:0; font-size:1rem; }
+    .contact-top small { display:block; margin-top:.25rem; color:#77828a; }
+    .contact-info { display:grid; gap:.45rem; margin-bottom:1rem; color:#59656c; font-size:.82rem; }
+    .contact-info a { color:#51788d; text-decoration:none; }
+    .contact-form { display:grid; gap:.55rem; border-top:1px solid #edf0f1; padding-top:1rem; }
+    .contact-form input, .contact-form textarea { width:100%; box-sizing:border-box; border:1px solid #d7dddf; border-radius:7px; padding:.65rem .7rem; font:inherit; }
+    .contact-form textarea { min-height:80px; resize:vertical; }
+    .contact-form button { border:0; border-radius:7px; padding:.65rem .8rem; background:#51788d; color:#fff; font-weight:800; cursor:pointer; }
+    .empty { padding:2rem; text-align:center; color:#77828a; background:#fff; border:1px solid #e3e7e8; border-radius:10px; }
+    @media (max-width:650px) { .contacts-head { align-items:flex-start; flex-direction:column; } .contacts-actions { width:100%; } .contacts-button { flex:1; justify-content:center; } }
+</style>
+
+<div class="contacts-head">
+    <div><div class="eyebrow">Prysmian Tunisia · équipe</div><h1>Contacts Prysmian</h1><p>Retrouvez les membres de l’équipe et contactez-les directement.</p></div>
+    <div class="contacts-actions">
+        {% if is_granted('ROLE_ADMIN') %}<a class="contacts-button primary" href="{{ path('app_users') }}">Gérer les contacts</a>{% endif %}
+    </div>
+</div>
+
+{% for message in app.flashes('contact_success') %}<div class="flash-success">{{ message }}</div>{% endfor %}
+{% for message in app.flashes('contact_error') %}<div class="flash-error">{{ message }}</div>{% endfor %}
+
+{% if contacts is empty %}
+    <div class="empty">Aucun contact actif n’est disponible.</div>
+{% else %}
+    <div class="contacts-grid">
+        {% for contact in contacts %}
+            <article class="contact-card">
+                <div class="contact-top">
+                    <div class="contact-avatar">{% if contact.profileImagePath %}<img src="{{ contact.profileImagePath }}" alt="Photo de {{ contact.fullName }}">{% else %}{{ contact.firstName|first }}{{ contact.lastName|first }}{% endif %}</div>
+                    <div><h2>{{ contact.fullName }}</h2><small>{{ contact.role.value|replace({'_':' '}) }}</small></div>
+                </div>
+                <div class="contact-info">
+                    <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                    {% if contact.phone %}<span>{{ contact.phone }}</span>{% endif %}
+                    <span>{{ contact.regionAssigned ?: 'Tous ateliers' }}</span>
+                </div>
+                <form class="contact-form" method="post" action="{{ path('app_contact_email', {id: contact.id}) }}">
+                    <input type="text" name="subject" placeholder="Objet du message" required maxlength="180">
+                    <textarea name="message" placeholder="Votre message" required></textarea>
+                    <button type="submit">Envoyer un email</button>
+                </form>
+            </article>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}
