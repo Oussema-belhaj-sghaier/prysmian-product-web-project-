@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Stock à réapprovisionner | Prysmian Tunisia{% endblock %}
+
+{% block body %}
+<style>
+    .stock-head { display:flex; justify-content:space-between; align-items:flex-end; gap:1rem; margin-bottom:1.5rem; }
+    .stock-head h1 { margin:.35rem 0 .3rem; font-size:2rem; }
+    .stock-head p { margin:0; color:#657079; }
+    .eyebrow { color:#d94841; font-size:.72rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    .stock-button { display:inline-flex; align-items:center; gap:.4rem; border-radius:8px; padding:.7rem 1rem; background:#d94841; color:#fff; font-weight:800; text-decoration:none; }
+    .stock-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; margin-bottom:1.25rem; }
+    .summary-card, .stock-table-wrap { background:#fff; border:1px solid #e3e7e8; border-radius:10px; box-shadow:0 8px 24px #1d2b3510; }
+    .summary-card { padding:1rem 1.1rem; }
+    .summary-card span { display:block; color:#77828a; font-size:.78rem; font-weight:700; }
+    .summary-card strong { display:block; margin-top:.4rem; font-size:1.7rem; }
+    .stock-table-wrap { overflow:auto; }
+    .stock-table { width:100%; border-collapse:collapse; font-size:.84rem; }
+    .stock-table th { padding:.8rem 1rem; color:#77828a; background:#fafbfb; text-align:left; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; }
+    .stock-table td { padding:.9rem 1rem; border-top:1px solid #f0f2f2; }
+    .stock-table tr:hover { background:#fcf7f6; }
+    .stock-badge { display:inline-flex; border-radius:999px; padding:.28rem .55rem; color:#a3312c; background:#fde5e3; font-size:.68rem; font-weight:800; }
+    .stock-empty { padding:2.5rem; text-align:center; color:#16704b; }
+    @media (max-width:700px) { .stock-head { align-items:flex-start; flex-direction:column; } .stock-summary { grid-template-columns:1fr; } }
+</style>
+
+<div class="stock-head">
+    <div><div class="eyebrow">Prysmian Tunisia · approvisionnement</div><h1>Stock à réapprovisionner</h1><p>Surveillez les références qui ont atteint leur seuil minimal.</p></div>
+    <a class="stock-button" href="{{ path('app_catalogue') }}">Voir le catalogue</a>
+</div>
+
+{% set totalStock = 0 %}
+{% set totalThreshold = 0 %}
+{% for cable in lowStockCables %}
+    {% set totalStock = totalStock + (cable.stockMeters ?: 0) %}
+    {% set totalThreshold = totalThreshold + (cable.stockAlertThreshold ?: 0) %}
+{% endfor %}
+
+<div class="stock-summary">
+    <div class="summary-card"><span>Références à surveiller</span><strong>{{ lowStockCables|length }}</strong></div>
+    <div class="summary-card"><span>Stock disponible</span><strong>{{ totalStock|number_format(0, ',', ' ') }} m</strong></div>
+    <div class="summary-card"><span>Seuil cumulé</span><strong>{{ totalThreshold|number_format(0, ',', ' ') }} m</strong></div>
+</div>
+
+<div class="stock-table-wrap">
+    <table class="stock-table">
+        <thead><tr><th>Référence</th><th>Désignation</th><th>Usine</th><th>Stock actuel</th><th>Seuil minimal</th><th>État</th></tr></thead>
+        <tbody>
+        {% for cable in lowStockCables %}
+            <tr><td><strong>{{ cable.referenceCode }}</strong></td><td>{{ cable.designation }}</td><td>{{ cable.factory ?: 'Non renseignée' }}</td><td>{{ (cable.stockMeters ?: 0)|number_format(0, ',', ' ') }} m</td><td>{{ (cable.stockAlertThreshold ?: 0)|number_format(0, ',', ' ') }} m</td><td><span class="stock-badge">Réapprovisionner</span></td></tr>
+        {% else %}
+            <tr><td colspan="6" class="stock-empty">Aucune référence ne nécessite actuellement de réapprovisionnement.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
