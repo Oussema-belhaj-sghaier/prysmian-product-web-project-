@@ -39,7 +39,7 @@ class CableCrudController extends AbstractController
         $cable->setReferenceCode($refCode ?: 'PRY-' . strtoupper(substr($cableType ?: 'BT', 0, 2)) . '-' . rand(100, 999))
             ->setDesignation($designation ?: 'Câble ' . ($cableType ?: 'BT'))
             ->setCableType(CableType::from($cableType ?: 'BT'))
-            ->setStatus(CableStatus::from($status ?: 'IN_STOCK'))
+            ->setStatus(CableStatus::from($this->normalizeStatus($status ?: 'IN_STOCK')))
             ->setNominalVoltage($nominalVoltage !== null && $nominalVoltage !== '' ? (float) $nominalVoltage : null)
             ->setConductorSection($conductorSection !== null && $conductorSection !== '' ? (float) $conductorSection : null)
             ->setConductorMaterial($conductorMaterial ?: 'COPPER')
@@ -58,7 +58,7 @@ class CableCrudController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', "Produit {$cable->getReferenceCode()} ajouté au catalogue avec succès !");
-        return $this->redirectToRoute('app_home');
+        return $this->redirectToRoute('app_catalogue');
     }
 
     #[Route('/{id}/edit', name: 'app_cable_edit', methods: ['POST'])]
@@ -67,7 +67,7 @@ class CableCrudController extends AbstractController
         $cable = $repo->find($id);
         if (!$cable) {
             $this->addFlash('error', 'Produit introuvable.');
-            return $this->redirectToRoute('app_home');
+            return $this->redirectToRoute('app_catalogue');
         }
 
         $designation = $request->request->get('designation');
@@ -90,7 +90,7 @@ class CableCrudController extends AbstractController
         if ($referenceCode) $cable->setReferenceCode($referenceCode);
         if ($designation) $cable->setDesignation($designation);
         if ($cableType) $cable->setCableType(CableType::from($cableType));
-        if ($status) $cable->setStatus(CableStatus::from($status));
+        if ($status) $cable->setStatus(CableStatus::from($this->normalizeStatus($status)));
         if ($nominalVoltage !== null && $nominalVoltage !== '') $cable->setNominalVoltage((float) $nominalVoltage);
         if ($conductorSection !== null && $conductorSection !== '') $cable->setConductorSection((float) $conductorSection);
         if ($conductorMaterial) $cable->setConductorMaterial($conductorMaterial);
@@ -106,7 +106,7 @@ class CableCrudController extends AbstractController
 
         $em->flush();
         $this->addFlash('success', "Produit {$cable->getReferenceCode()} mis à jour.");
-        return $this->redirectToRoute('app_home');
+        return $this->redirectToRoute('app_catalogue');
     }
 
     private function applyImage(Cable $cable, mixed $image): void
@@ -131,6 +131,41 @@ class CableCrudController extends AbstractController
         $cable->setImagePath('/images/products/' . $filename);
     }
 
+    private function normalizeStatus(string $status): string
+    {
+        return [
+            'En stock' => 'IN_STOCK',
+            'En production' => 'IN_PRODUCTION',
+            'Contrôle qualité' => 'QC_HOLD',
+            'Rupture de stock' => 'OUT_OF_STOCK',
+            'Arrêté' => 'DISCONTINUED',
+        ][$status] ?? $status;
+    }
+
+    #[Route('/bulk-delete', name: 'app_cable_bulk_delete', methods: ['POST'])]
+    public function bulkDelete(Request $request, CableRepository $repo, EntityManagerInterface $em): Response
+    {
+        $ids = array_values(array_filter($request->request->all('ids'), static fn (mixed $id): bool => is_string($id) && $id !== ''));
+        if ($ids === []) {
+            $this->addFlash('error', 'Sélectionnez au moins un produit à supprimer.');
+            return $this->redirectToRoute('app_catalogue');
+        }
+
+        $deleted = 0;
+        foreach ($ids as $id) {
+            $cable = $repo->find($id);
+            if ($cable) {
+                $em->remove($cable);
+                $deleted++;
+            }
+        }
+
+        $em->flush();
+        $this->addFlash('success', "$deleted produit(s) supprimé(s) du catalogue.");
+
+        return $this->redirectToRoute('app_catalogue');
+    }
+
     #[Route('/{id}/delete', name: 'app_cable_delete', methods: ['POST', 'DELETE'])]
     public function delete(string $id, CableRepository $repo, EntityManagerInterface $em): Response
     {
@@ -141,6 +176,6 @@ class CableCrudController extends AbstractController
             $em->flush();
             $this->addFlash('success', "Produit $ref supprimé du catalogue.");
         }
-        return $this->redirectToRoute('app_home');
+        return $this->redirectToRoute('app_catalogue');
     }
 }
