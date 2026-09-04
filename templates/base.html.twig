@@ -278,6 +278,19 @@
             padding: 2rem;
             flex: 1;
         }
+
+        .ai-launcher { position:fixed; right:24px; bottom:24px; z-index:300; border:0; border-radius:999px; padding:12px 16px; background:#d94841; color:#fff; font-weight:800; cursor:pointer; box-shadow:0 10px 24px #d9484155; }
+        .ai-panel { display:none; position:fixed; right:24px; bottom:82px; z-index:300; width:min(360px,calc(100vw - 32px)); background:#fff; border:1px solid #e3e7e8; border-radius:12px; box-shadow:0 18px 50px #1d2b3540; overflow:hidden; }
+        .ai-panel.open { display:block; }
+        .ai-header { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:#2c344d; color:#fff; }
+        .ai-header strong { font-size:14px; } .ai-header small { display:block; color:#b9c3cf; margin-top:3px; }
+        .ai-close { border:0; background:transparent; color:#fff; font-size:20px; cursor:pointer; }
+        .ai-messages { min-height:150px; max-height:260px; overflow:auto; padding:14px; background:#f7f9f9; }
+        .ai-message { margin-bottom:10px; padding:9px 11px; border-radius:9px; font-size:13px; line-height:1.45; }
+        .ai-message.bot { margin-right:20px; background:#fff; border:1px solid #e3e7e8; color:#39464d; } .ai-message.user { margin-left:20px; background:#d94841; color:#fff; }
+        .ai-suggestions { display:flex; gap:6px; overflow:auto; padding:10px 14px 0; } .ai-suggestions button { flex:0 0 auto; border:1px solid #d7dddf; border-radius:999px; padding:6px 9px; background:#fff; color:#59656c; font-size:11px; cursor:pointer; }
+        .ai-form { display:flex; gap:7px; padding:12px 14px; border-top:1px solid #edf0f1; } .ai-form input { min-width:0; flex:1; border:1px solid #d7dddf; border-radius:7px; padding:9px; } .ai-form button { border:0; border-radius:7px; padding:0 12px; background:#51788d; color:#fff; font-weight:800; cursor:pointer; }
+        @media (max-width:600px) { .ai-launcher{right:16px;bottom:16px}.ai-panel{right:16px;bottom:72px} }
     </style>
 </head>
 <body>
@@ -299,13 +312,13 @@
                 <a href="{{ path('app_catalogue') }}" class="menu-item {{ activePage|default('') == 'catalogue' ? 'active' }}" id="nav-cables">
                     <svg class="menu-svg-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
                     <span>Catalogue produits</span>
-                    <span class="menu-badge" style="background:#0284C7">50</span>
+                    <span class="menu-badge" style="background:#0284C7">{{ cables|default([])|length }}</span>
                 </a>
 
                 <a href="{{ path('app_alerts') }}" class="menu-item {{ activePage|default('') == 'alerts' ? 'active' }}" id="nav-alerts">
                     <svg class="menu-svg-icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                    <span>Alertes qualité</span>
-                    <span class="menu-badge">7</span>
+                    <span>Suivi du stock</span>
+                    <span class="menu-badge">{{ lowStockCables|default([])|length }}</span>
                 </a>
 
                 <div class="menu-category">Production</div>
@@ -317,7 +330,7 @@
 
                 <a href="{{ path('app_analyses') }}" class="menu-item {{ activePage|default('') == 'analysis' ? 'active' }}" id="nav-ml">
                     <svg class="menu-svg-icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="15" x2="23" y2="15"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="15" x2="4" y2="15"></line></svg>
-                    <span>Prédictions IA</span>
+                    <span>Suivi maintenance</span>
                 </a>
 
                 <div class="menu-category">Rapports & Administration</div>
@@ -329,15 +342,16 @@
                 </a>
                 {% endif %}
 
+                <a href="{{ path('app_contacts') }}" class="menu-item {{ activePage|default('') == 'contacts' ? 'active' }}" id="nav-contacts">
+                    <svg class="menu-svg-icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><polyline points="3 7 12 13 21 7"></polyline></svg>
+                    <span>Contacts Prysmian</span>
+                </a>
+
                 <a href="{{ path('app_report_pdf') }}" target="_blank" class="menu-item" id="nav-pdf">
                     <svg class="menu-svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     <span>Exporter Rapport PDF</span>
                 </a>
 
-                <a href="#setup-db" onclick="window.location.href='/setup-db'" class="menu-item" id="nav-setup">
-                    <svg class="menu-svg-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    <span>Re-seed Database</span>
-                </a>
             </nav>
 
             {% if app.user %}
@@ -380,5 +394,20 @@
             </div>
         </div>
     </div>
+    {% if app.user %}
+    <button class="ai-launcher" type="button" onclick="toggleAssistant()">✦ Assistant IA</button>
+    <section class="ai-panel" id="aiPanel" aria-label="Assistant IA">
+        <div class="ai-header"><div><strong>Prysmian Plant Assistant</strong><small>Stock · production · qualité</small></div><button class="ai-close" type="button" onclick="toggleAssistant()">×</button></div>
+        <div class="ai-messages" id="aiMessages"><div class="ai-message bot">Bonjour. Posez-moi une question sur votre atelier.</div></div>
+        <div class="ai-suggestions"><button type="button" onclick="askAssistant('Quel est l’état du stock ?')">État du stock</button><button type="button" onclick="askAssistant('Que prioriser en production ?')">Priorités production</button><button type="button" onclick="askAssistant('Y a-t-il un risque qualité ?')">Risques qualité</button></div>
+        <form class="ai-form" onsubmit="submitAssistant(event)"><input id="aiQuestion" placeholder="Votre question..." autocomplete="off"><button type="submit">Envoyer</button></form>
+    </section>
+    <script>
+    function toggleAssistant(){document.getElementById('aiPanel').classList.toggle('open')}
+    function addAssistantMessage(text,type){const message=document.createElement('div');message.className='ai-message '+type;message.textContent=text;const box=document.getElementById('aiMessages');box.appendChild(message);box.scrollTop=box.scrollHeight}
+    function askAssistant(question){document.getElementById('aiQuestion').value=question;document.getElementById('aiQuestion').focus()}
+    async function submitAssistant(event){event.preventDefault();const input=document.getElementById('aiQuestion');const question=input.value.trim();if(!question)return;input.value='';addAssistantMessage(question,'user');try{const response=await fetch('{{ path('app_assistant_ask') }}',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({question})});const data=await response.json();if(!response.ok)throw new Error(data.answer||'assistant');addAssistantMessage(data.answer||'Je ne peux pas répondre pour le moment.','bot')}catch(error){addAssistantMessage(error.message||'Assistant indisponible. Consultez la page Analyse IA.','bot')}}
+    </script>
+    {% endif %}
 </body>
 </html>
